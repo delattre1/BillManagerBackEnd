@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from datetime import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import Http404, HttpResponse
@@ -8,24 +8,12 @@ from .serializers import BillSerializer
 
 import pdftotext
 import requests
-import PyPDF2
-import io
+
+from .process_boleto import load_pdf, dados_boleto
 
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
-
-
-def load_pdf(pdf_file):
-    pdf = pdftotext.PDF(pdf_file)
-    pdf = pdf[0]
-
-    split = pdf.split()
-    clean = ' '.join(split).replace('_', '').replace(
-        '-', '').replace('(', '').replace(')', '')  # .replace('/','')
-    palavras = clean.split()
-
-    return palavras
 
 
 @api_view(['GET', 'POST'])
@@ -33,6 +21,8 @@ def api_bills(request):
     if request.method == 'POST':
         print(request.data)
         data = request.data
+        data['vencimento'] = datetime.strptime(
+            data['vencimento'], "%d/%m/%Y").strftime('%Y-%m-%d')
         new_bill = Bill(vencimento=data['vencimento'], empresa=data['empresa'],
                         valor=data['valor'], codigoPagamento=data['codigoPagamento'])
         new_bill.save()
@@ -49,5 +39,14 @@ def api_boleto(request):
         my_file = (request.data['File'])
         palavras = load_pdf(my_file)
         print(palavras)
+        vencimento, valor, codigo_pagamento = dados_boleto(palavras)
+        vencimento = datetime.strptime(
+            vencimento, "%d/%m/%Y").strftime('%Y-%m-%d')
+        empresa = 'Verificar'
+        new_bill = Bill(vencimento=vencimento, empresa=empresa,
+                        valor=valor, codigoPagamento=codigo_pagamento)
+        new_bill.save()
+        print(
+            f'vencimento: {vencimento}, R$: {valor}, codigo: {codigo_pagamento}')
 
     return HttpResponse("Hello, world. You're at the polls index.")
