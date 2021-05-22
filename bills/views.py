@@ -33,6 +33,18 @@ def api_bills(request):
     return Response(serialized_bill.data)
 
 
+@api_view(['GET', 'POST', 'DELETE'])
+def api_bill(request, bill_id):
+    if request.method == 'DELETE':
+        bill = Bill.objects.get(id=bill_id)
+        bill.delete()
+
+    all_bills = Bill.objects.all()
+    serialized_bill = BillSerializer(all_bills, many=True)
+
+    return Response(serialized_bill.data)
+
+
 @api_view(['GET', 'POST'])
 def api_boleto(request):
     if request.method == 'POST':

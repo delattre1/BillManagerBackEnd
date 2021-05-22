@@ -5,5 +5,6 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('bills/', views.api_bills),
+    path('bill/<int:bill_id>/', views.api_bill),
     path('boleto/', views.api_boleto),
 ]
