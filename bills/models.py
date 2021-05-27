@@ -18,3 +18,12 @@ class Bill(TimeStampMixin):
 
     def __str__():
         return f'{self.id} {self.empresa}'
+
+
+class Caixa(TimeStampMixin):
+    data = models.DateField()
+    valor = models.FloatField()
+    tipo = models.CharField(max_length=10)
+
+    def __str__():
+        return f'{self.id}'

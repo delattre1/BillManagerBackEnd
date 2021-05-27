@@ -93,7 +93,8 @@ def validate_dados(lista):
     try:
         return max(set(lista), key=lista.count)
     except:
-        return f"some error with {lista}"
+        return 1
+        # return f"some error with {lista}"
 
 
 def correct_bar_code(codigo):
