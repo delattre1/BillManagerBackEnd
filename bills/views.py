@@ -59,7 +59,7 @@ def api_bill(request, bill_id):
 
 
 @api_view(['GET', 'POST'])
-def api_boleto(request, boleto_id):
+def api_boleto(request, boleto_id=''):
     if request.method == 'POST':
         uploadedFile = (request.data['File'])
         palavras = load_pdf(uploadedFile)
@@ -79,6 +79,13 @@ def api_boleto(request, boleto_id):
         if boleto_id:
             selected_boleto = Bill.objects.get(id=boleto_id)
             boleto_path = BillSerializer(selected_boleto).data['boleto']
+            file_path = (settings.MEDIA_ROOT + boleto_path)
+            with open(file_path, "rb") as f:
+                pdfFile = File(f)
+                response = HttpResponse(pdfFile.read())
+                response['Content-Disposition'] = 'attachment'
+
+                return response
 
             return Response(boleto_path)
 

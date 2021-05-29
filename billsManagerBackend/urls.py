@@ -8,6 +8,6 @@ urlpatterns = [
     path('api/', include('bills.urls')),
 ]
 
-if setting.DEBUG:
-    urlpatterns += static(setting.STATIC_URL,
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL,
                           document_root=settings.STATIC_URL)
