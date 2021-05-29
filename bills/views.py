@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from django.core.files import File
+
+from django.conf import settings
 from datetime import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -10,10 +13,6 @@ import pdftotext
 import requests
 
 from .process_boleto import load_pdf, dados_boleto
-
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
 
 
 def format_from_django_datetime(data):
@@ -38,7 +37,7 @@ def api_bills(request):
                         valor=data['valor'], codigoPagamento=data['codigoPagamento'])
         new_bill.save()
 
-    all_bills = Bill.objects.all()
+    all_bills = Bill.objects.all().order_by('vencimento')
     serialized_bill = BillSerializer(all_bills, many=True)
 
     return Response(serialized_bill.data)
@@ -49,32 +48,42 @@ def api_bill(request, bill_id):
     if request.method == 'DELETE':
         bill = Bill.objects.get(id=bill_id)
         bill.delete()
+        all_bills = Bill.objects.all()
+        serialized_bill = BillSerializer(all_bills, many=True)
 
-    all_bills = Bill.objects.all()
-    serialized_bill = BillSerializer(all_bills, many=True)
+    elif request.method == 'GET':
+        bill = Bill.objects.get(id=bill_id)
+        serialized_bill = BillSerializer(bill)
 
     return Response(serialized_bill.data)
 
 
 @api_view(['GET', 'POST'])
-def api_boleto(request):
+def api_boleto(request, boleto_id):
     if request.method == 'POST':
-        my_file = (request.data['File'])
-        palavras = load_pdf(my_file)
+        uploadedFile = (request.data['File'])
+        palavras = load_pdf(uploadedFile)
         print(palavras)
         vencimento, valor, codigo_pagamento = dados_boleto(palavras)
         vencimento = format_to_django_datetime(vencimento)
         empresa = 'Verificar'
         new_bill = Bill(vencimento=vencimento, empresa=empresa,
-                        valor=valor, codigoPagamento=codigo_pagamento)
+                        valor=valor, codigoPagamento=codigo_pagamento, boleto=uploadedFile)
         new_bill.save()
         print(
             f'vencimento: {vencimento}, R$: {valor}, codigo: {codigo_pagamento}')
 
-    return HttpResponse("Hello, world. You're at the polls index.")
+        return HttpResponse("Hello, world. You're at the polls index.")
+
+    if request.method == 'GET':
+        if boleto_id:
+            selected_boleto = Bill.objects.get(id=boleto_id)
+            boleto_path = BillSerializer(selected_boleto).data['boleto']
+
+            return Response(boleto_path)
 
 
-@api_view(['GET', 'POST'])
+@ api_view(['GET', 'POST'])
 def api_movimentacoes(request):
     if request.method == 'POST':
         dados = request.data
@@ -85,13 +94,13 @@ def api_movimentacoes(request):
         movimentacao = Caixa(data=data, valor=valor, tipo=tipo)
         movimentacao.save()
 
-    movimentacoes = Caixa.objects.all()
+    movimentacoes = Caixa.objects.all().order_by('data')
     serialized_mov = CaixaSerializer(movimentacoes, many=True)
 
     return Response(serialized_mov.data)
 
 
-@api_view(['GET', 'POST', 'DELETE'])
+@ api_view(['GET', 'POST', 'DELETE'])
 def api_movimentacao(request, mov_id):
     if request.method == 'DELETE':
         movimentacao = Caixa.objects.get(id=mov_id)

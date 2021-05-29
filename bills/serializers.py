@@ -5,7 +5,8 @@ from .models import Bill, Caixa
 class BillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bill
-        fields = ['id', 'vencimento', 'empresa', 'valor', 'codigoPagamento']
+        fields = ['id', 'vencimento', 'empresa',
+                  'valor', 'codigoPagamento', 'boleto']
 
 
 class CaixaSerializer(serializers.ModelSerializer):
