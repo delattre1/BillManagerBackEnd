@@ -1,5 +1,6 @@
 import pdftotext
 import re
+from django.conf import settings
 
 
 def remove_ponctuation(text):
@@ -51,17 +52,17 @@ def get_words_isnt(path, empresa_words):
     return not_empresa
 
 
-def push_words_isnt_empresas_to_db():
-    ex1 = '../media/ex1.pdf'
-    ex2 = '../media/ex2.pdf'
-    ex3 = '../media/ex3.pdf'
-    ex4 = '../media/Boleto_0001_013688_144526.PDF'
-    ex5 = '../media/bl204910p.pdf'
+def get_words_isnt_empresas():
+    ex1 = settings.MEDIA_ROOT + '/ex1.pdf'
+    ex2 = settings.MEDIA_ROOT + '/ex2.pdf'
+    ex3 = settings.MEDIA_ROOT + '/ex3.pdf'
+    ex4 = settings.MEDIA_ROOT + '/Boleto_0001_013688_144526.PDF'
+    ex5 = settings.MEDIA_ROOT + '/bl204910p.pdf'
 
     dic_empresas = {ex1: ['CZECH', 'E', 'DAL', 'COL', 'ASSESSORIA', 'CONTÁBIL'],
                     ex2: ['MACPONTA', 'MAQUINAS', 'AGRICOLAS'],
                     ex3: ['AGROPARCERIA', 'MANUTENCAO', 'DE', 'MAQS', 'AGRICOLAS', 'LTDA'],
-                    ex4: ['AM', 'COMERCIO', 'DE', 'MOLAS', 'LTDA']
+                    ex4: ['AM', 'COMERCIO', 'DE', 'MOLAS', 'LTDA'],
                     ex5: ['MACPONTA', 'MAQUINAS', 'AGRICOLAS'],
                     }
 

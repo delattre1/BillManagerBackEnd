@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 
@@ -24,6 +25,15 @@ class Caixa(TimeStampMixin):
     data = models.DateField()
     valor = models.FloatField()
     tipo = models.CharField(max_length=10)
+
+    def __str__():
+        return f'{self.id}'
+
+
+class BlackListWords(TimeStampMixin):
+    from django.contrib.postgres.fields import ArrayField
+    words_array = models.CharField(max_length=10)
+    pieces = ArrayField(models.IntegerField())
 
     def __str__():
         return f'{self.id}'

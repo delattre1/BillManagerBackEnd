@@ -6,7 +6,7 @@ from datetime import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import Http404, HttpResponse
-from .models import Bill, Caixa
+from .models import Bill, Caixa, BlackListWords
 from .serializers import BillSerializer, CaixaSerializer
 
 import pdftotext
@@ -117,3 +117,14 @@ def api_movimentacao(request, mov_id):
     serialized_mov = CaixaSerializer(movimentacoes, many=True)
 
     return Response(serialized_mov.data)
+
+
+@ api_view(['GET'])
+def update_words_isnt_enterprises_name(request):
+    from .process_boleto_empresa import get_words_isnt_empresas
+    BlackListWords.objects.all().delete()
+    words = get_words_isnt_empresas()
+    black_list = BlackListWords(words_array=words)
+    black_list.save()
+
+    return HttpResponse(words)
