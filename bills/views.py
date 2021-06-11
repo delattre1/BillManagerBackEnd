@@ -6,9 +6,8 @@ from datetime import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import Http404, HttpResponse
-from .models import Bill, Caixa, BlackListWords
+from .models import Bill, Caixa
 from .serializers import BillSerializer, CaixaSerializer
-
 import pdftotext
 import requests
 
@@ -63,10 +62,12 @@ def api_boleto(request, boleto_id=''):
     if request.method == 'POST':
         uploadedFile = (request.data['File'])
         palavras = load_pdf(uploadedFile)
-        print(palavras)
-        vencimento, valor, codigo_pagamento = dados_boleto(palavras)
+
+        blacklist_path = (settings.MEDIA_ROOT + '/blacklist.txt')
+        vencimento, valor, codigo_pagamento, empresa = dados_boleto(
+            palavras, blacklist_path)
         vencimento = format_to_django_datetime(vencimento)
-        empresa = 'Verificar'
+
         new_bill = Bill(vencimento=vencimento, empresa=empresa,
                         valor=valor, codigoPagamento=codigo_pagamento, boleto=uploadedFile)
         new_bill.save()
@@ -86,8 +87,6 @@ def api_boleto(request, boleto_id=''):
                 response['Content-Disposition'] = 'attachment'
 
                 return response
-
-            return Response(boleto_path)
 
 
 @ api_view(['GET', 'POST'])
@@ -117,14 +116,3 @@ def api_movimentacao(request, mov_id):
     serialized_mov = CaixaSerializer(movimentacoes, many=True)
 
     return Response(serialized_mov.data)
-
-
-@ api_view(['GET'])
-def update_words_isnt_enterprises_name(request):
-    from .process_boleto_empresa import get_words_isnt_empresas
-    BlackListWords.objects.all().delete()
-    words = get_words_isnt_empresas()
-    black_list = BlackListWords(words_array=words)
-    black_list.save()
-
-    return HttpResponse(words)

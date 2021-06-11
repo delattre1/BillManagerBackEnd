@@ -9,5 +9,4 @@ urlpatterns = [
     path('boleto/', views.api_boleto),
     path('movimentacoes/', views.api_movimentacoes),
     path('movimentacao/<int:mov_id>/', views.api_movimentacao),
-    path('update_words_list/', views.update_words_isnt_enterprises_name)
 ]

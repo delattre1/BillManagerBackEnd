@@ -1,6 +1,4 @@
 from django.contrib import admin
-from .models import Bill, BlackListWords
+from .models import Bill
 
 admin.site.register(Bill)
-admin.site.register(BlackListWords)
-# Register your models here.

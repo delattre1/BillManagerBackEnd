@@ -28,12 +28,3 @@ class Caixa(TimeStampMixin):
 
     def __str__():
         return f'{self.id}'
-
-
-class BlackListWords(TimeStampMixin):
-    from django.contrib.postgres.fields import ArrayField
-    words_array = models.CharField(max_length=10)
-    pieces = ArrayField(models.IntegerField())
-
-    def __str__():
-        return f'{self.id}'
