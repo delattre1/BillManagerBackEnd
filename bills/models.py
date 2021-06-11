@@ -14,7 +14,16 @@ class Bill(TimeStampMixin):
     empresa = models.CharField(max_length=50)
     valor = models.FloatField()
     codigoPagamento = models.CharField(max_length=50)
-    boleto = models.FileField(blank=True, null=True)
+    boleto = models.FileField(blank=True, null=True)  # , upload_to='media/')
 
     def __str__():
         return f'{self.id} {self.empresa}'
+
+
+class Caixa(TimeStampMixin):
+    data = models.DateField()
+    valor = models.FloatField()
+    tipo = models.CharField(max_length=10)
+
+    def __str__():
+        return f'{self.id}'
