@@ -62,11 +62,19 @@ def api_boleto(request, boleto_id=''):
     if request.method == 'POST':
         uploadedFile = (request.data['File'])
         palavras = load_pdf(uploadedFile)
+        print(palavras)
 
         blacklist_path = (settings.MEDIA_ROOT + '/blacklist.txt')
         vencimento, valor, codigo_pagamento, empresa = dados_boleto(
             palavras, blacklist_path)
         vencimento = format_to_django_datetime(vencimento)
+        informacao = [vencimento, valor, codigo_pagamento, empresa]
+
+        for i in informacao:
+            try:
+                print(i)
+            except Exception as e:
+                print(e)
 
         new_bill = Bill(vencimento=vencimento, empresa=empresa,
                         valor=valor, codigoPagamento=codigo_pagamento, boleto=uploadedFile)
