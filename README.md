@@ -7,7 +7,7 @@
 run: pip install -r requirements.txt
 
 
-#### Datanase:
+#### Database:
 Default local db: sqlite3
 
 python3 manage.py makemigrations
