@@ -1,6 +1,6 @@
 # Bill Manager
 
-#### Live version: https://intense-sierra-39653.herokuapp.com/fluxoCaixa
+#### Live version: https://intense-sierra-39653.herokuapp.com/ 
 
 ## Instructions
 
