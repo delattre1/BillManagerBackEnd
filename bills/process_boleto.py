@@ -2,6 +2,8 @@ import pdftotext
 import re
 from datetime import datetime
 import os
+from .cria_blacklist import get_name
+import json
 
 
 def load_pdf(pdf_file):
@@ -34,17 +36,22 @@ def is_float_or_int(string):
             return False
 
 
-def get_data_from_boleto(path):
-    palavras = load_pdf(path)
-    vencimento, valor, pagamento = dados_boleto(palavras)
-    fornecedor = "Fornecedor nao identificado"
-    dados_conta = {'Vencimento': vencimento, 'Valor': valor,
-                   'Fornecedor': fornecedor, 'Pagamento': pagamento}
+def get_empresa(palavras, blacklist_path):
+    blacklist = get_blacklist(blacklist_path)
+    empresa = get_name(palavras, blacklist)
 
-    return dados_conta
+    return empresa
 
 
-def dados_boleto(palavras):
+def get_blacklist(blacklist_path):
+    with open(blacklist_path) as file:
+        data = json.load(file)
+        words = data['words']
+
+        return words
+
+
+def dados_boleto(palavras, blacklist_path):
     datas_vencimento = []
     valores_boleto = []
     codigo_de_barras = []
@@ -76,8 +83,9 @@ def dados_boleto(palavras):
     valor = str(validate_dados(valores_boleto))
     valor = valor.replace(',', '.')
     codigo_pagamento = select_rigth_code_from_list(possiveis_codigos)
+    empresa = get_empresa(palavras, blacklist_path)
 
-    return data_vencimento, valor, codigo_pagamento
+    return data_vencimento, valor, codigo_pagamento, empresa
 
 
 def data_valida(data):
@@ -121,33 +129,3 @@ def select_rigth_code_from_list(lista_possibilities):
 
         if codigo is not False:
             return codigo
-
-
-def upload_to_db(path):
-    import pymongo
-    db_credential = get_credentials()
-    client = pymongo.MongoClient(db_credential)
-    db = client['teste']
-    collection = db['collection_teste']
-    dados_boleto = get_data_from_boleto(path)
-    try:
-        collection.insert_one(dados_boleto)
-
-        return 'successfully added to database '
-    except:
-        return 'some error ocurred with boleto'
-
-
-def upload_conta_to_db(dic_dados_conta):
-    import pymongo
-    db_credential = get_credentials()
-    client = pymongo.MongoClient(db_credential)
-    db = client['teste']
-    collection = db['collection_teste']
-    print(f'printando o dic: {dic_dados_conta}')
-    try:
-        collection.insert_one(dic_dados_conta)
-
-        return 'successfully added to database '
-    except:
-        return 'some error ocurred with manual entry'

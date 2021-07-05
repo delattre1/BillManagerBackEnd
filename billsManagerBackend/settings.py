@@ -12,7 +12,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 SECRET_KEY = 'django-insecure-hb&g3j@*qjcuyx_n*y_59xt!k9n#4yu6g#l(ft%d0vbn0+a*c6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['frozen-wave-31888.herokuapp.com',
                  'intense-sierra-39653.herokuapp.com', '0.0.0.0', 'localhost', '127.0.0.1']
@@ -111,8 +111,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_ALLOW_ALL = True
